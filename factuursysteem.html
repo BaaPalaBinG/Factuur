@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Factuursysteem - Hensen Liquid Inspections</title>
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --bg: #f2f2f2;
+      --card-bg: #ffffff;
+      --text: #222222;
+      --muted: #555555;
+      --border: #d0d0d0;
+      --chip-bg: #e0e0e0;
+      --entry-bg: #fafafa;
+      --accent: #007aff;
+      --danger: #d7263d;
+      --toast-bg: #222222;
+    }
+
+    body.dark {
+      --bg: #050509;
+      --card-bg: #111119;
+      --text: #f5f5f7;
+      --muted: #a0a0b5;
+      --border: #303040;
+      --chip-bg: #202230;
+      --entry-bg: #15151f;
+      --accent: #4f8cff;
+      --danger: #ff5c7a;
+      --toast-bg: #000000;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .app {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    h1 {
+      font-size: 1.2rem;
+      margin: 0;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .nav-tabs {
+      display: inline-flex;
+      border-radius: 999px;
+      background: var(--chip-bg);
+      padding: 3px;
+    }
+
+    .nav-tabs button {
+      border: none;
+      background: transparent;
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      color: var(--text);
+    }
+
+    .nav-tabs button.active {
+      background: var(--card-bg);
+      box-shadow: 0 0 0 1px var(--border);
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: 10px;
+      padding: 14px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      margin-bottom: 14px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-bottom: 3px;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 6px 8px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      font-size: 0.85rem;
+      background: var(--card-bg);
+      color: var(--text);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 60px;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(0,122,255,0.2);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 10px 12px;
+    }
+
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    button.primary {
+      border: none;
+      border-radius: 999px;
+      padding: 8px 16px;
+      font-size: 0.85rem;
+      background: var(--accent);
+      color: #fff;
+      cursor: pointer;
+    }
+
+    button.secondary {
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-size: 0.85rem;
+      background: transparent;
+      color: var(--text);
+      cursor: pointer;
+    }
+
+    button.secondary.small {
+      padding: 6px 10px;
+      font-size: 0.75rem;
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    .theme-toggle {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 34px;
+      padding: 0;
+      font-size: 1rem;
+    }
+
+    .section-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .split {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .split > div {
+      flex: 1;
+      min-width: 220px;
+    }
+
+    .inline-inputs {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .items-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8rem;
+      margin-top: 6px;
+    }
+
+    .items-table th,
+    .items-table td {
+      padding: 4px 3px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+    }
+
+    .items-table input {
+      width: 100%;
+      padding: 4px 6px;
+      font-size: 0.8rem;
+    }
+
+    .items-table th {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .right {
+      text-align: right;
+    }
+
+    .totals {
+      margin-top: 8px;
+      max-width: 260px;
+      margin-left: auto;
+      font-size: 0.8rem;
+    }
+
+    .totals-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 3px;
+    }
+
+    .totals-row.total {
+      font-weight: 600;
+      font-size: 0.9rem;
+      border-top: 1px solid var(--border);
+      padding-top: 4px;
+      margin-top: 4px;
+    }
+
+    .invoice-preview {
+      border-radius: 8px;
+      border: 1px dashed var(--border);
+      background: var(--entry-bg);
+      padding: 10px;
+      font-size: 0.8rem;
+      margin-top: 10px;
+    }
+
+    .invoice-preview h2 {
+      font-size: 1rem;
+      margin: 0 0 6px 0;
+    }
+
+    .preview-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 8px;
+    }
+
+    .preview-block {
+      min-width: 200px;
+    }
+
+    .preview-block strong {
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .invoice-meta {
+      font-size: 0.8rem;
+      margin-bottom: 6px;
+    }
+
+    .invoice-items {
+      margin-top: 4px;
+    }
+
+    .preview-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8rem;
+      margin-top: 4px;
+    }
+
+    .preview-table th,
+    .preview-table td {
+      padding: 4px 3px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .preview-table th {
+      text-align: left;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .small {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    .list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      max-height: 260px;
+      overflow-y: auto;
+      margin-top: 6px;
+    }
+
+    .list-item {
+      background: var(--entry-bg);
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      padding: 6px 8px;
+      font-size: 0.8rem;
+      display: flex;
+      justify-content: space-between;
+      gap: 6px;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    .list-item:hover {
+      border-color: var(--accent);
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 1px 6px;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      background: var(--chip-bg);
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--toast-bg);
+      color: #fff;
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+      z-index: 9999;
+    }
+
+    .toast.show {
+      opacity: 0.9;
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>Factuursysteem – Hensen Liquid Inspections</h1>
+    <div class="header-right">
+      <div class="nav-tabs">
+        <button id="tabInvoice" class="active" type="button">Factuur</button>
+        <button id="tabHistory" type="button">Factuurhistorie</button>
+        <button id="tabClients" type="button">Klanten & Tarieven</button>
+      </div>
+      <button id="themeToggle" class="secondary small theme-toggle" type="button" title="Wissel thema">🌙</button>
+    </div>
+  </header>
+
+  <!-- SCHERM: FACTUUR -->
+  <section id="screenInvoice" class="card">
+    <div class="section-title">Factuurgegevens</div>
+    <div class="grid" style="margin-bottom:10px;">
+      <div>
+        <label for="invoiceNumber">Factuurnummer</label>
+        <input id="invoiceNumber" type="text" />
+      </div>
+      <div>
+        <label for="invoiceDate">Factuurdatum</label>
+        <input id="invoiceDate" type="date" />
+      </div>
+      <div>
+        <label for="dueDate">Vervaldatum (30 dagen)</label>
+        <input id="dueDate" type="date" />
+      </div>
+      <div>
+        <label for="clientSelect">Klant</label>
+        <select id="clientSelect"></select>
+      </div>
+    </div>
+
+    <div class="split">
+      <div>
+        <div class="section-title">Klantgegevens</div>
+        <textarea id="clientDetails"></textarea>
+      </div>
+      <div>
+        <div class="section-title">Omschrijving</div>
+        <textarea id="description" placeholder="Bijvoorbeeld: Survey + scheepsnaam / referentie"></textarea>
+      </div>
+    </div>
+
+    <div style="margin-top:12px;">
+      <div class="section-title">Regels</div>
+      <table class="items-table">
+        <thead>
+          <tr>
+            <th>Omschrijving</th>
+            <th class="right">Aantal</th>
+            <th class="right">Tarief (€)</th>
+            <th class="right">Totaal (€)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><input id="hoursDesc" type="text" value="Uren liquid cargo survey" /></td>
+            <td><input id="hoursQty" type="number" step="0.25" placeholder="Uren" /></td>
+            <td><input id="hoursRate" type="number" step="0.01" /></td>
+            <td class="right" id="hoursTotalCell">€ 0,00</td>
+          </tr>
+          <tr>
+            <td><input id="kmDesc" type="text" value="Reiskosten" /></td>
+            <td><input id="kmQty" type="number" step="1" placeholder="Kilometers" /></td>
+            <td><input id="kmRate" type="number" step="0.01" /></td>
+            <td class="right" id="kmTotalCell">€ 0,00</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="totals">
+        <div class="totals-row">
+          <span>Subtotaal</span>
+          <span id="subTotalText">€ 0,00</span>
+        </div>
+        <div class="totals-row">
+          <span>BTW 0%</span>
+          <span>€ 0,00</span>
+        </div>
+        <div class="totals-row total">
+          <span>Totaal te betalen</span>
+          <span id="grandTotalText">€ 0,00</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button id="saveInvoice" type="button" class="primary">Factuur opslaan</button>
+      <button id="copyText" type="button" class="secondary">Kopieer als tekst</button>
+      <button id="printInvoice" type="button" class="secondary">Print / PDF</button>
+      <button id="newInvoice" type="button" class="secondary small">Nieuwe factuur</button>
+    </div>
+
+    <div class="invoice-preview" id="invoicePreview">
+      <!-- Voorbeeld wordt via JS gevuld -->
+    </div>
+  </section>
+
+  <!-- SCHERM: HISTORIE -->
+  <section id="screenHistory" class="card" style="display:none;">
+    <div class="section-title">Factuurhistorie (lokaal opgeslagen)</div>
+    <div id="historyList" class="list"></div>
+    <div class="small">Facturen worden alleen in jouw browser opgeslagen (localStorage). Geen cloud of server.</div>
+  </section>
+
+  <!-- SCHERM: KLANTEN -->
+  <section id="screenClients" class="card" style="display:none;">
+    <div class="section-title">Klanten & standaardtarieven</div>
+    <div class="grid">
+      <div>
+        <label for="clientNameEdit">Klantnaam</label>
+        <input id="clientNameEdit" type="text" placeholder="Bijv. JEPO Marine Service" />
+      </div>
+      <div>
+        <label for="clientHoursRateEdit">Uurtarief (€)</label>
+        <input id="clientHoursRateEdit" type="number" step="0.01" />
+      </div>
+      <div>
+        <label for="clientKmRateEdit">Kilometertarief (€)</label>
+        <input id="clientKmRateEdit" type="number" step="0.01" />
+      </div>
+    </div>
+    <div style="margin-top:8px;">
+      <label for="clientAddressEdit">Adresblok</label>
+      <textarea id="clientAddressEdit" placeholder="Straat + nr&#10;Postcode Plaats"></textarea>
+    </div>
+    <div class="btn-row">
+      <button id="saveClient" type="button" class="primary">Klant opslaan / bijwerken</button>
+      <button id="deleteClient" type="button" class="secondary small">Klant verwijderen</button>
+    </div>
+    <div style="margin-top:10px;">
+      <div class="section-title">Bestaande klanten</div>
+      <div id="clientsList" class="list"></div>
+    </div>
+  </section>
+</div>
+
+<div id="toast" class="toast">Gekopieerd 👍</div>
+
+<script>
+  const THEME_KEY = "hli_invoice_theme";
+  const CLIENTS_KEY = "hli_invoice_clients_v1";
+  const INVOICES_KEY = "hli_invoices_v1";
+  const LAST_NR_KEY = "hli_last_invoice_nr_v1";
+
+  const tabInvoice = document.getElementById("tabInvoice");
+  const tabHistory = document.getElementById("tabHistory");
+  const tabClients = document.getElementById("tabClients");
+  const screenInvoice = document.getElementById("screenInvoice");
+  const screenHistory = document.getElementById("screenHistory");
+  const screenClients = document.getElementById("screenClients");
+  const themeToggle = document.getElementById("themeToggle");
+
+  const invoiceNumberInput = document.getElementById("invoiceNumber");
+  const invoiceDateInput = document.getElementById("invoiceDate");
+  const dueDateInput = document.getElementById("dueDate");
+  const clientSelect = document.getElementById("clientSelect");
+  const clientDetailsTextarea = document.getElementById("clientDetails");
+  const descriptionTextarea = document.getElementById("description");
+
+  const hoursDescInput = document.getElementById("hoursDesc");
+  const hoursQtyInput = document.getElementById("hoursQty");
+  const hoursRateInput = document.getElementById("hoursRate");
+  const hoursTotalCell = document.getElementById("hoursTotalCell");
+
+  const kmDescInput = document.getElementById("kmDesc");
+  const kmQtyInput = document.getElementById("kmQty");
+  const kmRateInput = document.getElementById("kmRate");
+  const kmTotalCell = document.getElementById("kmTotalCell");
+
+  const subTotalText = document.getElementById("subTotalText");
+  const grandTotalText = document.getElementById("grandTotalText");
+
+  const saveInvoiceBtn = document.getElementById("saveInvoice");
+  const copyTextBtn = document.getElementById("copyText");
+  const printInvoiceBtn = document.getElementById("printInvoice");
+  const newInvoiceBtn = document.getElementById("newInvoice");
+  const invoicePreview = document.getElementById("invoicePreview");
+
+  const historyList = document.getElementById("historyList");
+  const clientsList = document.getElementById("clientsList");
+
+  const clientNameEdit = document.getElementById("clientNameEdit");
+  const clientHoursRateEdit = document.getElementById("clientHoursRateEdit");
+  const clientKmRateEdit = document.getElementById("clientKmRateEdit");
+  const clientAddressEdit = document.getElementById("clientAddressEdit");
+  const saveClientBtn = document.getElementById("saveClient");
+  const deleteClientBtn = document.getElementById("deleteClient");
+
+  const toastEl = document.getElementById("toast");
+
+  let clients = [];
+  let invoices = [];
+  let activeClientId = null;
+
+  const ownCompany = {
+    name: "Hensen Liquid Inspections",
+    address: "Kievitstraat 72\n3265 CB Piershil",
+    phone: "06-24 51 25 77",
+    kvk: "91056616",
+    btw: "NL004863667B66",
+    iban: "NL60 RABO 0365 2629 51"
+  };
+
+  function showToast(msg) {
+    toastEl.textContent = msg;
+    toastEl.classList.add("show");
+    setTimeout(() => toastEl.classList.remove("show"), 1800);
+  }
+
+  function applyTheme(theme) {
+    if (theme === "dark") {
+      document.body.classList.add("dark");
+      themeToggle.textContent = "☀️";
+    } else {
+      document.body.classList.remove("dark");
+      themeToggle.textContent = "🌙";
+    }
+  }
+
+  const savedTheme = localStorage.getItem(THEME_KEY) || "light";
+  applyTheme(savedTheme);
+
+  themeToggle.addEventListener("click", () => {
+    const newTheme = document.body.classList.contains("dark") ? "light" : "dark";
+    applyTheme(newTheme);
+    localStorage.setItem(THEME_KEY, newTheme);
+  });
+
+  function loadClients() {
+    try {
+      const raw = localStorage.getItem(CLIENTS_KEY);
+      clients = raw ? JSON.parse(raw) : [];
+      if (!Array.isArray(clients)) clients = [];
+    } catch {
+      clients = [];
+    }
+    // Zorg dat JEPO Marine er minstens 1x in staat
+    if (!clients.length) {
+      clients.push({
+        id: "jepo_marine",
+        name: "JEPO Marine Service",
+        address: "Melkweg 75\n3225 VD Hellevoetsluis",
+        hoursRate: 0,
+        kmRate: 0
+      });
+    }
+  }
+
+  function saveClients() {
+    localStorage.setItem(CLIENTS_KEY, JSON.stringify(clients));
+  }
+
+  function loadInvoices() {
+    try {
+      const raw = localStorage.getItem(INVOICES_KEY);
+      invoices = raw ? JSON.parse(raw) : [];
+      if (!Array.isArray(invoices)) invoices = [];
+    } catch {
+      invoices = [];
+    }
+  }
+
+  function saveInvoices() {
+    localStorage.setItem(INVOICES_KEY, JSON.stringify(invoices));
+  }
+
+  function getNextInvoiceNumber() {
+    let last = localStorage.getItem(LAST_NR_KEY);
+    if (!last) {
+      last = "20260000";
+    }
+    const next = String(parseInt(last, 10) + 1);
+    localStorage.setItem(LAST_NR_KEY, next);
+    return next;
+  }
+
+  function renderClientSelect() {
+    clientSelect.innerHTML = "";
+    clients.forEach(c => {
+      const opt = document.createElement("option");
+      opt.value = c.id;
+      opt.textContent = c.name;
+      clientSelect.appendChild(opt);
+    });
+  }
+
+  function renderClientsList() {
+    clientsList.innerHTML = "";
+    clients.forEach(c => {
+      const div = document.createElement("div");
+      div.className = "list-item";
+      div.dataset.id = c.id;
+      div.innerHTML = `
+        <div>
+          <strong>${c.name}</strong><br>
+          <span class="small">${(c.address || "").split("\n")[0] || ""}</span>
+        </div>
+        <div class="right">
+          <div class="pill">€ ${c.hoursRate || 0}/uur</div>
+          <div class="pill">€ ${c.kmRate || 0}/km</div>
+        </div>
+      `;
+      div.addEventListener("click", () => loadClientIntoEditor(c.id));
+      clientsList.appendChild(div);
+    });
+  }
+
+  function loadClientIntoEditor(id) {
+    const c = clients.find(x => x.id === id);
+    if (!c) return;
+    activeClientId = c.id;
+    clientNameEdit.value = c.name || "";
+    clientHoursRateEdit.value = c.hoursRate || "";
+    clientKmRateEdit.value = c.kmRate || "";
+    clientAddressEdit.value = c.address || "";
+  }
+
+  function onClientSelectChange() {
+    const id = clientSelect.value;
+    const c = clients.find(x => x.id === id);
+    if (!c) return;
+    clientDetailsTextarea.value = c.name + "\n" + (c.address || "");
+    if (c.hoursRate != null) hoursRateInput.value = c.hoursRate;
+    if (c.kmRate != null) kmRateInput.value = c.kmRate;
+    recalcTotals();
+  }
+
+  function recalcTotals() {
+    const hQty = parseFloat(hoursQtyInput.value.replace(",", ".") || "0");
+    const hRate = parseFloat(hoursRateInput.value.replace(",", ".") || "0");
+    const kQty = parseFloat(kmQtyInput.value.replace(",", ".") || "0");
+    const kRate = parseFloat(kmRateInput.value.replace(",", ".") || "0");
+
+    const hTotal = isNaN(hQty*hRate) ? 0 : hQty*hRate;
+    const kTotal = isNaN(kQty*kRate) ? 0 : kQty*kRate;
+    const sub = hTotal + kTotal;
+
+    function fmt(num) {
+      return "€ " + num.toFixed(2).replace(".", ",");
+    }
+
+    hoursTotalCell.textContent = fmt(hTotal);
+    kmTotalCell.textContent = fmt(kTotal);
+    subTotalText.textContent = fmt(sub);
+    grandTotalText.textContent = fmt(sub);
+
+    renderPreview();
+  }
+
+  function ensureDates() {
+    if (!invoiceDateInput.value) {
+      const today = new Date().toISOString().split("T")[0];
+      invoiceDateInput.value = today;
+    }
+    if (!dueDateInput.value && invoiceDateInput.value) {
+      const d = new Date(invoiceDateInput.value);
+      d.setDate(d.getDate() + 30);
+      dueDateInput.value = d.toISOString().split("T")[0];
+    }
+  }
+
+  function renderPreview() {
+    ensureDates();
+    const nr = invoiceNumberInput.value || "";
+    const invDate = invoiceDateInput.value || "";
+    const dueDate = dueDateInput.value || "";
+    const clientBlock = clientDetailsTextarea.value || "";
+    const desc = descriptionTextarea.value || "";
+
+    const hDesc = hoursDescInput.value || "";
+    const hQty = hoursQtyInput.value || "";
+    const hRate = hoursRateInput.value || "";
+    const hTotal = hoursTotalCell.textContent || "";
+
+    const kDesc = kmDescInput.value || "";
+    const kQty = kmQtyInput.value || "";
+    const kRate = kmRateInput.value || "";
+    const kTotal = kmTotalCell.textContent || "";
+
+    const total = grandTotalText.textContent || "€ 0,00";
+
+    const ownAddressHtml = ownCompany.address.replace(/\n/g, "<br>");
+    const clientHtml = clientBlock.replace(/\n/g, "<br>");
+
+    invoicePreview.innerHTML = `
+      <h2>Factuurvoorbeeld</h2>
+      <div class="preview-header">
+        <div class="preview-block">
+          <strong>${ownCompany.name}</strong>
+          ${ownAddressHtml}<br>
+          Tel: ${ownCompany.phone}<br>
+          KvK: ${ownCompany.kvk}<br>
+          BTW: ${ownCompany.btw}<br>
+          IBAN: ${ownCompany.iban}
+        </div>
+        <div class="preview-block">
+          <strong>Factuur aan</strong>
+          ${clientHtml || "<em>Geen klant gekozen</em>"}<br><br>
+          <div class="invoice-meta">
+            <div>Factuurnummer: <strong>${nr}</strong></div>
+            <div>Factuurdatum: ${invDate || "-"}</div>
+            <div>Vervaldatum: ${dueDate || "-"}</div>
+          </div>
+        </div>
+      </div>
+      <div class="invoice-items">
+        ${desc ? `<div><strong>Omschrijving:</strong><br>${desc.replace(/\n/g,"<br>")}</div>` : ""}
+        <table class="preview-table">
+          <thead>
+            <tr>
+              <th>Omschrijving</th>
+              <th class="right">Aantal</th>
+              <th class="right">Tarief</th>
+              <th class="right">Totaal</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${(hDesc || hQty || hRate) ? `
+              <tr>
+                <td>${hDesc}</td>
+                <td class="right">${hQty}</td>
+                <td class="right">€ ${parseFloat(hRate||0).toFixed(2).replace(".",",")}</td>
+                <td class="right">${hTotal}</td>
+              </tr>` : ""}
+            ${(kDesc || kQty || kRate) ? `
+              <tr>
+                <td>${kDesc}</td>
+                <td class="right">${kQty}</td>
+                <td class="right">€ ${parseFloat(kRate||0).toFixed(2).replace(".",",")}</td>
+                <td class="right">${kTotal}</td>
+              </tr>` : ""}
+          </tbody>
+        </table>
+        <div class="totals" style="margin-top:8px;">
+          <div class="totals-row">
+            <span>Subtotaal</span>
+            <span>${subTotalText.textContent}</span>
+          </div>
+          <div class="totals-row">
+            <span>BTW 0%</span>
+            <span>€ 0,00</span>
+          </div>
+          <div class="totals-row total">
+            <span>Totaal</span>
+            <span>${total}</span>
+          </div>
+        </div>
+        <div class="small">
+          Betaling binnen 30 dagen na factuurdatum op IBAN ${ownCompany.iban} t.n.v. ${ownCompany.name}.
+        </div>
+      </div>
+    `;
+  }
+
+  function formatMoney(num) {
+    return "€ " + num.toFixed(2).replace(".", ",");
+  }
+
+  function buildInvoiceObject() {
+    ensureDates();
+    const nr = invoiceNumberInput.value || getNextInvoiceNumber();
+    invoiceNumberInput.value = nr;
+
+    const invDate = invoiceDateInput.value;
+    const dueDate = dueDateInput.value;
+    const clientId = clientSelect.value;
+    const clientBlock = clientDetailsTextarea.value;
+    const desc = descriptionTextarea.value;
+
+    const hDesc = hoursDescInput.value;
+    const hQty = parseFloat(hoursQtyInput.value.replace(",", ".") || "0");
+    const hRate = parseFloat(hoursRateInput.value.replace(",", ".") || "0");
+    const kDesc = kmDescInput.value;
+    const kQty = parseFloat(kmQtyInput.value.replace(",", ".") || "0");
+    const kRate = parseFloat(kmRateInput.value.replace(",", ".") || "0");
+
+    const hTotal = isNaN(hQty*hRate) ? 0 : hQty*hRate;
+    const kTotal = isNaN(kQty*kRate) ? 0 : kQty*kRate;
+    const total = hTotal + kTotal;
+
+    return {
+      id: nr,
+      nr,
+      invoiceDate: invDate,
+      dueDate,
+      clientId,
+      clientBlock,
+      description: desc,
+      lines: [
+        { desc: hDesc, qty: hQty, rate: hRate, total: hTotal },
+        { desc: kDesc, qty: kQty, rate: kRate, total: kTotal }
+      ],
+      total
+    };
+  }
+
+  function saveCurrentInvoice() {
+    const inv = buildInvoiceObject();
+    // check if exists
+    const existingIndex = invoices.findIndex(x => x.id === inv.id);
+    if (existingIndex >= 0) invoices[existingIndex] = inv;
+    else invoices.push(inv);
+    saveInvoices();
+    renderHistoryList();
+    showToast("Factuur opgeslagen (lokaal).");
+  }
+
+  function renderHistoryList() {
+    historyList.innerHTML = "";
+    if (!invoices.length) {
+      historyList.innerHTML = '<div style="font-size:0.8rem;color:var(--muted);">Nog geen facturen opgeslagen.</div>';
+      return;
+    }
+    const sorted = [...invoices].sort((a,b)=> (a.nr > b.nr ? -1 : 1));
+    sorted.forEach(inv => {
+      const div = document.createElement("div");
+      div.className = "list-item";
+      const clientName = (inv.clientBlock || "").split("\n")[0] || "";
+      const totalText = formatMoney(inv.total || 0);
+      div.innerHTML = `
+        <div>
+          <strong>${inv.nr}</strong> – ${clientName}<br>
+          <span class="small">${inv.invoiceDate || ""}</span>
+        </div>
+        <div class="right">
+          <span class="pill">${totalText}</span>
+        </div>
+      `;
+      div.addEventListener("click", () => loadInvoice(inv.nr));
+      historyList.appendChild(div);
+    });
+  }
+
+  function loadInvoice(nr) {
+    const inv = invoices.find(x => x.nr === nr);
+    if (!inv) return;
+    setActiveScreen("invoice");
+
+    invoiceNumberInput.value = inv.nr;
+    invoiceDateInput.value = inv.invoiceDate || "";
+    dueDateInput.value = inv.dueDate || "";
+    clientDetailsTextarea.value = inv.clientBlock || "";
+    descriptionTextarea.value = inv.description || "";
+
+    const line1 = inv.lines[0] || {};
+    const line2 = inv.lines[1] || {};
+
+    hoursDescInput.value = line1.desc || "";
+    hoursQtyInput.value = line1.qty || "";
+    hoursRateInput.value = line1.rate || "";
+    kmDescInput.value = line2.desc || "";
+    kmQtyInput.value = line2.qty || "";
+    kmRateInput.value = line2.rate || "";
+
+    recalcTotals();
+  }
+
+  function copyAsText() {
+    const inv = buildInvoiceObject();
+    const clientName = (inv.clientBlock || "").split("\n")[0] || "";
+    const h = inv.lines[0];
+    const k = inv.lines[1];
+
+    const lines = [];
+    lines.push(`Factuur: ${inv.nr}`);
+    lines.push(`Factuurdatum: ${inv.invoiceDate}`);
+    lines.push(`Vervaldatum: ${inv.dueDate}`);
+    lines.push("");
+    lines.push(`Klant: ${clientName}`);
+    lines.push("");
+    if (h && (h.desc || h.qty || h.rate)) {
+      lines.push(`${h.desc}: ${h.qty} uur x € ${h.rate.toFixed(2)} = ${formatMoney(h.total)}`);
+    }
+    if (k && (k.desc || k.qty || k.rate)) {
+      lines.push(`${k.desc}: ${k.qty} km x € ${k.rate.toFixed(2)} = ${formatMoney(k.total)}`);
+    }
+    lines.push("");
+    lines.push(`Totaal: ${formatMoney(inv.total)}`);
+    lines.push("");
+    lines.push(`Gelieve binnen 30 dagen te voldoen op IBAN ${ownCompany.iban}.`);
+
+    const text = lines.join("\n");
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(() => {
+        showToast("Factuurtekst gekopieerd.");
+      }).catch(() => {
+        showToast("Kopiëren mislukt.");
+      });
+    } else {
+      const tmp = document.createElement("textarea");
+      tmp.value = text;
+      document.body.appendChild(tmp);
+      tmp.select();
+      document.execCommand("copy");
+      document.body.removeChild(tmp);
+      showToast("Factuurtekst gekopieerd.");
+    }
+  }
+
+  function setActiveScreen(name) {
+    if (name === "invoice") {
+      screenInvoice.style.display = "";
+      screenHistory.style.display = "none";
+      screenClients.style.display = "none";
+      tabInvoice.classList.add("active");
+      tabHistory.classList.remove("active");
+      tabClients.classList.remove("active");
+    } else if (name === "history") {
+      screenInvoice.style.display = "none";
+      screenHistory.style.display = "";
+      screenClients.style.display = "none";
+      tabInvoice.classList.remove("active");
+      tabHistory.classList.add("active");
+      tabClients.classList.remove("active");
+    } else if (name === "clients") {
+      screenInvoice.style.display = "none";
+      screenHistory.style.display = "none";
+      screenClients.style.display = "";
+      tabInvoice.classList.remove("active");
+      tabHistory.classList.remove("active");
+      tabClients.classList.add("active");
+    }
+  }
+
+  tabInvoice.addEventListener("click", () => setActiveScreen("invoice"));
+  tabHistory.addEventListener("click", () => setActiveScreen("history"));
+  tabClients.addEventListener("click", () => setActiveScreen("clients"));
+
+  [hoursQtyInput, hoursRateInput, kmQtyInput, kmRateInput].forEach(el => {
+    el.addEventListener("input", recalcTotals);
+  });
+
+  clientSelect.addEventListener("change", onClientSelectChange);
+
+  saveInvoiceBtn.addEventListener("click", saveCurrentInvoice);
+  copyTextBtn.addEventListener("click", copyAsText);
+  printInvoiceBtn.addEventListener("click", () => window.print());
+  newInvoiceBtn.addEventListener("click", () => {
+    invoiceNumberInput.value = getNextInvoiceNumber();
+    invoiceDateInput.value = "";
+    dueDateInput.value = "";
+    descriptionTextarea.value = "";
+    hoursQtyInput.value = "";
+    hoursRateInput.value = "";
+    kmQtyInput.value = "";
+    kmRateInput.value = "";
+    recalcTotals();
+    ensureDates();
+    renderPreview();
+  });
+
+  saveClientBtn.addEventListener("click", () => {
+    const name = clientNameEdit.value.trim();
+    if (!name) {
+      showToast("Klantnaam is verplicht.");
+      return;
+    }
+    const hoursRate = parseFloat(clientHoursRateEdit.value.replace(",", ".") || "0");
+    const kmRate = parseFloat(clientKmRateEdit.value.replace(",", ".") || "0");
+    const address = clientAddressEdit.value;
+
+    if (!activeClientId) {
+      activeClientId = "client_" + Date.now().toString(16);
+    }
+    const existing = clients.find(c => c.id === activeClientId);
+    if (existing) {
+      existing.name = name;
+      existing.hoursRate = hoursRate;
+      existing.kmRate = kmRate;
+      existing.address = address;
+    } else {
+      clients.push({
+        id: activeClientId,
+        name,
+        hoursRate,
+        kmRate,
+        address
+      });
+    }
+    saveClients();
+    renderClientSelect();
+    renderClientsList();
+    showToast("Klant opgeslagen.");
+  });
+
+  deleteClientBtn.addEventListener("click", () => {
+    if (!activeClientId) {
+      showToast("Geen klant geselecteerd.");
+      return;
+    }
+    const c = clients.find(x => x.id === activeClientId);
+    if (!c) return;
+    if (!confirm(`Klant "${c.name}" verwijderen?`)) return;
+    clients = clients.filter(x => x.id !== activeClientId);
+    activeClientId = null;
+    clientNameEdit.value = "";
+    clientHoursRateEdit.value = "";
+    clientKmRateEdit.value = "";
+    clientAddressEdit.value = "";
+    saveClients();
+    renderClientSelect();
+    renderClientsList();
+    showToast("Klant verwijderd.");
+  });
+
+  function init() {
+    loadClients();
+    loadInvoices();
+    renderClientSelect();
+    renderClientsList();
+    renderHistoryList();
+
+    if (!invoiceNumberInput.value) {
+      invoiceNumberInput.value = getNextInvoiceNumber();
+    }
+    ensureDates();
+    onClientSelectChange();
+    recalcTotals();
+  }
+
+  init();
+</script>
+</body>
+</html>
